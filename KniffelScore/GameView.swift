@@ -7,6 +7,7 @@ struct GameView: View {
 
     @State private var selectedCategory: ScoreCategory?
     @State private var editingPlayerIndex: Int?
+    @State private var isCorrection = false
     @State private var playerHeaderOffset: CGFloat = 0
 
     private let rowHeight: CGFloat = 38
@@ -86,9 +87,11 @@ struct GameView: View {
                 category: cat,
                 playerName: sheetPlayerName
             ) { score in
-                if game.isFinished, let idx = editingPlayerIndex {
+                if isCorrection, let idx = editingPlayerIndex {
+                    // Correction: overwrite the value, don't advance the turn
                     store.editScore(score, categoryId: cat.id, playerIndex: idx)
                 } else {
+                    // Normal entry for the current player: advance to next turn
                     store.enterScore(score, categoryId: cat.id)
                 }
             }
@@ -238,12 +241,14 @@ struct GameView: View {
             calculatedCell(categoryId: cat.id, player: player)
         } else {
             let score = player.scores[cat.id]
-            let canTap = game.isFinished ||
-                (playerIndex == game.currentPlayerIndex && score == nil)
+            // Tappable when: box is already filled (correction) OR it's the
+            // current player's empty box (normal entry).
+            let canTap = score != nil || playerIndex == game.currentPlayerIndex
 
             if canTap {
                 Button {
                     editingPlayerIndex = playerIndex
+                    isCorrection = score != nil   // true → use editScore, keep turn
                     selectedCategory = cat
                 } label: {
                     if let s = score {
@@ -253,8 +258,6 @@ struct GameView: View {
                     }
                 }
                 .buttonStyle(.plain)
-            } else if let s = score {
-                scoredCellLabel(score: s, dimmed: false)
             } else {
                 emptyCell()
             }
