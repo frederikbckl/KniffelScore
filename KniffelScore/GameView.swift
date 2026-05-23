@@ -10,7 +10,7 @@ struct GameView: View {
     private let rowHeight: CGFloat = 38
     private let headerHeight: CGFloat = 52
     private let labelWidth: CGFloat = 130
-    private let columnWidth: CGFloat = 76
+    private let minColumnWidth: CGFloat = 76
 
     private var game: Game { store.game! }
 
@@ -23,25 +23,31 @@ struct GameView: View {
 
             Divider()
 
-            HStack(alignment: .top, spacing: 0) {
-                labelColumn
-                    .frame(width: labelWidth)
-                    .background(Color(.systemBackground))
+            GeometryReader { geo in
+                let availWidth = geo.size.width - labelWidth - 0.5
+                let colWidth = max(minColumnWidth, availWidth / CGFloat(game.players.count))
 
-                Rectangle()
-                    .fill(Color(.separator))
-                    .frame(width: 0.5)
-
-                ScrollView(.horizontal, showsIndicators: false) {
+                ScrollView(.vertical, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 0) {
-                        ForEach(Array(game.players.enumerated()), id: \.1.id) { idx, _ in
-                            playerColumn(playerIndex: idx)
+                        labelColumn
+                            .frame(width: labelWidth)
+                            .background(Color(.systemBackground))
+
+                        Rectangle()
+                            .fill(Color(.separator))
+                            .frame(width: 0.5)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(alignment: .top, spacing: 0) {
+                                ForEach(Array(game.players.enumerated()), id: \.1.id) { idx, _ in
+                                    playerColumn(playerIndex: idx, width: colWidth)
+                                }
+                            }
                         }
                     }
+                    .padding(.bottom, 16)
                 }
             }
-
-            Spacer(minLength: 0)
         }
         .sheet(item: $selectedCategory) { cat in
             ScoreEntrySheetView(
@@ -144,7 +150,7 @@ struct GameView: View {
 
     // MARK: - Player column
 
-    private func playerColumn(playerIndex: Int) -> some View {
+    private func playerColumn(playerIndex: Int, width: CGFloat) -> some View {
         let player = game.players[playerIndex]
         let isCurrent = !game.isFinished && playerIndex == game.currentPlayerIndex
 
@@ -162,7 +168,7 @@ struct GameView: View {
                         .foregroundStyle(Color.accentColor)
                 }
             }
-            .frame(width: columnWidth, height: headerHeight)
+            .frame(width: width, height: headerHeight)
             .background(isCurrent
                 ? Color.accentColor.opacity(0.12)
                 : Color(.secondarySystemBackground))
@@ -170,7 +176,7 @@ struct GameView: View {
             // Score cells
             ForEach(ScoreCategories.all) { cat in
                 scoreCellContent(cat: cat, player: player, playerIndex: playerIndex)
-                    .frame(width: columnWidth, height: rowHeight)
+                    .frame(width: width, height: rowHeight)
                     .overlay(alignment: .bottom) {
                         rowSeparator(for: cat)
                     }
