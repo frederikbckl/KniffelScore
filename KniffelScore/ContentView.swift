@@ -1,61 +1,35 @@
-//
-//  ContentView.swift
-//  KniffelScore
-//
-//  Created by Frederik Bickel on 23.05.26.
-//
-
 import SwiftUI
-import SwiftData
 
-struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
-    var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
+enum AppScreen {
+    case start, playerSetup, game, result
 }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+struct ContentView: View {
+    @State private var store = GameStore()
+    @State private var screen: AppScreen = .start
+
+    var body: some View {
+        Group {
+            switch screen {
+            case .start:
+                StartView(store: store, screen: $screen)
+            case .playerSetup:
+                PlayerSetupView(store: store, screen: $screen)
+            case .game:
+                if store.game != nil {
+                    GameView(store: store, screen: $screen)
+                } else {
+                    StartView(store: store, screen: $screen)
+                        .onAppear { screen = .start }
+                }
+            case .result:
+                if store.game != nil {
+                    ResultView(store: store, screen: $screen)
+                } else {
+                    StartView(store: store, screen: $screen)
+                        .onAppear { screen = .start }
+                }
+            }
+        }
+    }
 }
