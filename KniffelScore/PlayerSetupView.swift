@@ -59,7 +59,7 @@ struct PlayerSetupView: View {
                         .font(.title2.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
-                        .background(canStart ? Color.accentColor : Color(.systemGray3))
+                        .background(canStart ? Color.appPrimary : Color(.systemGray3))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }

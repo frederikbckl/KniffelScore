@@ -141,7 +141,7 @@ struct GameView: View {
                         .font(.subheadline.weight(.semibold))
                         .padding(.horizontal, 18)
                         .padding(.vertical, 9)
-                        .background(Color.accentColor)
+                        .background(Color.appPrimary)
                         .foregroundStyle(.white)
                         .clipShape(Capsule())
                 }
@@ -208,12 +208,12 @@ struct GameView: View {
             if isCurrent {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.appPrimary)
             }
         }
         .frame(width: width, height: headerHeight)
         .background(isCurrent
-            ? Color.accentColor.opacity(0.12)
+            ? Color.appPrimary.opacity(0.12)
             : Color(.secondarySystemBackground))
         .overlay(alignment: .leading) {
             Rectangle()
@@ -278,11 +278,14 @@ struct GameView: View {
 
     private func calculatedCell(categoryId: String, player: Player) -> some View {
         let value = ScoreCalculator.calculatedValue(categoryId: categoryId, for: player)
+        let bonusEarned = categoryId == "calc_bonus" && value == 35
         return Text(value.map { "\($0)" } ?? "—")
             .font(.caption.weight(.medium))
-            .foregroundStyle(Color.secondary)
+            .foregroundStyle(bonusEarned ? Color.appGreen : Color.secondary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(.tertiarySystemBackground))
+            .background(bonusEarned
+                ? Color.appGreen.opacity(0.08)
+                : Color(.tertiarySystemBackground))
     }
 
     private func scoredCellLabel(score: Int, dimmed: Bool) -> some View {
@@ -290,15 +293,15 @@ struct GameView: View {
             .font(.callout.weight(.semibold))
             .foregroundStyle(score == 0 ? Color(.tertiaryLabel) : Color.primary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(dimmed ? Color.accentColor.opacity(0.04) : Color(.systemBackground))
+            .background(dimmed ? Color.appPrimary.opacity(0.04) : Color(.systemBackground))
     }
 
     private func plusCellLabel() -> some View {
         Image(systemName: "plus.circle.fill")
             .font(.body)
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(Color.appPrimary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.accentColor.opacity(0.07))
+            .background(Color.appPrimary.opacity(0.07))
     }
 
     private func emptyCell() -> some View {

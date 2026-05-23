@@ -11,6 +11,7 @@ struct ScoreEntrySheetView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // Header
                 VStack(spacing: 4) {
                     Text(category.name)
                         .font(.title.weight(.bold))
@@ -29,6 +30,7 @@ struct ScoreEntrySheetView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") { dismiss() }
+                        .foregroundStyle(Color.appPrimary)
                 }
             }
         }
@@ -44,18 +46,14 @@ struct ScoreEntrySheetView: View {
     @ViewBuilder
     private var inputArea: some View {
         switch category.kind {
-        case .upperSection:
-            upperSectionInput
-        case .fixedScore:
-            fixedScoreInput
-        case .freeScore:
-            freeScoreInput
-        case .calculated:
-            EmptyView()
+        case .upperSection: upperSectionInput
+        case .fixedScore:   fixedScoreInput
+        case .freeScore:    freeScoreInput
+        case .calculated:   EmptyView()
         }
     }
 
-    // MARK: - Upper section
+    // MARK: - Upper section (0× – 5×)
 
     private var upperSectionInput: some View {
         VStack(spacing: 20) {
@@ -79,29 +77,32 @@ struct ScoreEntrySheetView: View {
                                 .font(.title2.weight(.bold))
                             Text("\(points) Pkt.")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(count == 0
+                                    ? Color(.tertiaryLabel)
+                                    : Color.appPrimary.opacity(0.7))
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
                         .background(count == 0
                             ? Color(.tertiarySystemBackground)
-                            : Color.accentColor.opacity(0.12))
+                            : Color.appPrimary.opacity(0.09))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(count == 0
+                                .strokeBorder(count == 0
                                     ? Color.clear
-                                    : Color.accentColor.opacity(0.35), lineWidth: 1)
+                                    : Color.appPrimary.opacity(0.25),
+                                    lineWidth: 1)
                         )
                     }
-                    .foregroundStyle(count == 0 ? .secondary : .primary)
+                    .foregroundStyle(count == 0 ? Color(.secondaryLabel) : Color.appPrimary)
                 }
             }
             .padding(.horizontal, 20)
         }
     }
 
-    // MARK: - Fixed score
+    // MARK: - Fixed score (Erfüllt / Gestrichen)
 
     private var fixedScoreInput: some View {
         VStack(spacing: 14) {
@@ -119,7 +120,7 @@ struct ScoreEntrySheetView: View {
                         .font(.title2.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 22)
-                        .background(Color.accentColor)
+                        .background(Color.appPrimary)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
@@ -132,7 +133,7 @@ struct ScoreEntrySheetView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 22)
                         .background(Color(.secondarySystemBackground))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(.secondaryLabel))
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }
@@ -140,7 +141,7 @@ struct ScoreEntrySheetView: View {
         }
     }
 
-    // MARK: - Free score
+    // MARK: - Free score (wheel picker)
 
     private var freeScoreInput: some View {
         VStack(spacing: 20) {
@@ -160,7 +161,7 @@ struct ScoreEntrySheetView: View {
                         .font(.title2.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
-                        .background(Color.accentColor)
+                        .background(Color.appPrimary)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
@@ -173,7 +174,7 @@ struct ScoreEntrySheetView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(Color(.secondarySystemBackground))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(.secondaryLabel))
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }

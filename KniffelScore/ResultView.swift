@@ -34,65 +34,97 @@ struct ResultView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+
+            // ── Winner banner ──────────────────────────────────────────────
             if let winner = ranked.first {
-                VStack(spacing: 6) {
-                    Text("GEWINNER")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .tracking(1.5)
-                    Text(winner.player.name)
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                    Text("\(winner.total) Punkte")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            Color.appPrimary,
+                            Color(red: 88/255, green: 28/255, blue: 135/255)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+
+                    VStack(spacing: 10) {
+                        Image(systemName: "trophy.fill")
+                            .font(.system(size: 34))
+                            .foregroundStyle(.white.opacity(0.85))
+
+                        Text("GEWINNER")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.65))
+                            .tracking(2.5)
+
+                        Text(winner.player.name)
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+
+                        Text("\(winner.total) Punkte")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(Color.appGreen)
+                    }
+                    .padding(.vertical, 44)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 36)
-                .background(Color.accentColor.opacity(0.1))
             }
 
+            // ── Ranking list ───────────────────────────────────────────────
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(ranked) { item in
-                        HStack(spacing: 12) {
-                            Text("\(item.rank).")
-                                .font(.title3.weight(.bold))
-                                .foregroundStyle(item.rank == 1 ? Color.accentColor : Color(.tertiaryLabel))
-                                .frame(width: 32, alignment: .leading)
+                        HStack(spacing: 14) {
+                            // Circular rank badge
+                            ZStack {
+                                Circle()
+                                    .fill(item.rank == 1
+                                        ? Color.appPrimary
+                                        : Color(.tertiarySystemBackground))
+                                    .frame(width: 36, height: 36)
+                                Text("\(item.rank)")
+                                    .font(.callout.weight(.bold))
+                                    .foregroundStyle(item.rank == 1
+                                        ? .white
+                                        : Color(.tertiaryLabel))
+                            }
 
                             Text(item.player.name)
-                                .font(.title3.weight(item.rank == 1 ? .semibold : .regular))
+                                .font(.body.weight(item.rank == 1 ? .semibold : .regular))
 
                             Spacer()
 
                             Text("\(item.total) Pkt.")
-                                .font(.title3.weight(.semibold))
-                                .foregroundStyle(item.rank == 1 ? Color.accentColor : .primary)
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(item.rank == 1
+                                    ? Color.appPrimary
+                                    : Color(.secondaryLabel))
                         }
                         .padding(.horizontal, 24)
-                        .padding(.vertical, 18)
-                        .background(item.rank == 1 ? Color.accentColor.opacity(0.05) : Color(.systemBackground))
+                        .padding(.vertical, 16)
 
-                        Divider().padding(.leading, 24)
+                        Divider()
+                            .padding(.leading, 74) // align with name text
                     }
                 }
-                .padding(.top, 8)
+                .padding(.top, 4)
             }
 
             Spacer(minLength: 0)
 
+            // ── Buttons ────────────────────────────────────────────────────
             VStack(spacing: 12) {
                 Button {
                     store.clearGame()
                     screen = .playerSetup
                 } label: {
-                    Text("Neues Spiel")
+                    Text("Nochmal!")
                         .font(.title2.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
-                        .background(Color.accentColor)
+                        .background(Color.appPrimary)
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
 
                 Button {
@@ -101,10 +133,10 @@ struct ResultView: View {
                 } label: {
                     Text("Tschau Kakao")
                         .font(.body.weight(.medium))
-                        .foregroundStyle(Color(.secondaryLabel))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(Color(.secondarySystemBackground))
+                        .foregroundStyle(Color(.secondaryLabel))
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }
