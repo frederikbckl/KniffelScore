@@ -4,8 +4,6 @@ struct ResultView: View {
     let store: GameStore
     @Binding var screen: AppScreen
 
-    private var game: Game { store.game! }
-
     private struct RankedPlayer: Identifiable {
         var id: UUID { player.id }
         let player: Player
@@ -14,6 +12,7 @@ struct ResultView: View {
     }
 
     private var ranked: [RankedPlayer] {
+        guard let game = store.game else { return [] }
         let sorted = game.players
             .map { ($0, ScoreCalculator.grandTotal(for: $0)) }
             .sorted { $0.1 > $1.1 }
