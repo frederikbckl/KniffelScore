@@ -17,8 +17,8 @@ struct PlayerSetupView: View {
         let previous = store.lastPlayerNames
         if previous.isEmpty {
             _entries = State(initialValue: [
-                PlayerEntry(name: "Spieler 1"),
-                PlayerEntry(name: "Spieler 2"),
+                PlayerEntry(name: "Spieler:in 1"),
+                PlayerEntry(name: "Spieler:in 2"),
             ])
         } else {
             _entries = State(initialValue: previous.map { PlayerEntry(name: $0) })
@@ -34,7 +34,7 @@ struct PlayerSetupView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 List {
-                    Section("Spieler") {
+                    Section("Spieler:in") {
                         ForEach($entries) { $entry in
                             TextField("Name", text: $entry.name)
                         }
@@ -42,9 +42,9 @@ struct PlayerSetupView: View {
 
                         if entries.count < 10 {
                             Button {
-                                entries.append(PlayerEntry(name: "Spieler \(entries.count + 1)"))
+                                entries.append(PlayerEntry(name: "Spieler:in \(entries.count + 1)"))
                             } label: {
-                                Label("Spieler hinzufügen", systemImage: "plus")
+                                Label("Spieler:in hinzufügen", systemImage: "plus")
                             }
                         }
                     }
@@ -67,7 +67,7 @@ struct PlayerSetupView: View {
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
             }
-            .navigationTitle("Spieler")
+            .navigationTitle("Spieler:in")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
