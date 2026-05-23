@@ -40,7 +40,7 @@ struct PlayerSetupView: View {
                         }
                         .onDelete { entries.remove(atOffsets: $0) }
 
-                        if entries.count < 6 {
+                        if entries.count < 10 {
                             Button {
                                 entries.append(PlayerEntry(name: "Spieler \(entries.count + 1)"))
                             } label: {

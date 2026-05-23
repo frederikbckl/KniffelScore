@@ -1,11 +1,5 @@
 import SwiftUI
 
-private struct HScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
 
 struct GameView: View {
     let store: GameStore
@@ -77,22 +71,13 @@ struct GameView: View {
                                         playerScoreColumn(playerIndex: idx, width: colWidth)
                                     }
                                 }
-                                .background(
-                                    GeometryReader { scrollGeo in
-                                        Color.clear.preference(
-                                            key: HScrollOffsetKey.self,
-                                            value: scrollGeo.frame(in: .named("hscroll")).minX
-                                        )
-                                    }
-                                )
                             }
-                            .coordinateSpace(name: "hscroll")
+                            .onScrollGeometryChange(for: CGFloat.self, of: { $0.contentOffset.x }) { _, newX in
+                                playerHeaderOffset = -newX
+                            }
                         }
                         .padding(.bottom, 16)
                     }
-                }
-                .onPreferenceChange(HScrollOffsetKey.self) { value in
-                    playerHeaderOffset = value
                 }
             }
         }
