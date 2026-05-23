@@ -9,10 +9,21 @@ struct PlayerSetupView: View {
     let store: GameStore
     @Binding var screen: AppScreen
 
-    @State private var entries: [PlayerEntry] = [
-        PlayerEntry(name: "Spieler 1"),
-        PlayerEntry(name: "Spieler 2"),
-    ]
+    @State private var entries: [PlayerEntry]
+
+    init(store: GameStore, screen: Binding<AppScreen>) {
+        self.store = store
+        self._screen = screen
+        let previous = store.lastPlayerNames
+        if previous.isEmpty {
+            _entries = State(initialValue: [
+                PlayerEntry(name: "Spieler 1"),
+                PlayerEntry(name: "Spieler 2"),
+            ])
+        } else {
+            _entries = State(initialValue: previous.map { PlayerEntry(name: $0) })
+        }
+    }
 
     private var canStart: Bool {
         !entries.isEmpty &&

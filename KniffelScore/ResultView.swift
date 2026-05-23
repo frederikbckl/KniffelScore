@@ -81,17 +81,32 @@ struct ResultView: View {
 
             Spacer(minLength: 0)
 
-            Button {
-                store.clearGame()
-                screen = .start
-            } label: {
-                Text("Neues Spiel")
-                    .font(.title2.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 18)
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+            VStack(spacing: 12) {
+                Button {
+                    store.clearGame()
+                    screen = .playerSetup
+                } label: {
+                    Text("Neues Spiel")
+                        .font(.title2.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .background(Color.accentColor)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
+
+                Button {
+                    store.clearGame()
+                    screen = .start
+                } label: {
+                    Text("Tschau Kakao")
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Color(.secondaryLabel))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 24)

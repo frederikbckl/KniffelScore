@@ -6,6 +6,9 @@ final class GameStore {
     var game: Game?
 
     private let saveKey = "kniffelGame_v1"
+    private let lastPlayersKey = "kniffelLastPlayers_v1"
+
+    private(set) var lastPlayerNames: [String] = []
 
     init() { load() }
 
@@ -34,6 +37,12 @@ final class GameStore {
     }
 
     func clearGame() {
+        if let names = game?.players.map(\.name), !names.isEmpty {
+            lastPlayerNames = names
+            if let data = try? JSONEncoder().encode(names) {
+                UserDefaults.standard.set(data, forKey: lastPlayersKey)
+            }
+        }
         game = nil
         UserDefaults.standard.removeObject(forKey: saveKey)
     }
@@ -45,9 +54,13 @@ final class GameStore {
     }
 
     private func load() {
-        guard let data = UserDefaults.standard.data(forKey: saveKey),
-              let g = try? JSONDecoder().decode(Game.self, from: data)
-        else { return }
-        game = g
+        if let data = UserDefaults.standard.data(forKey: saveKey),
+           let g = try? JSONDecoder().decode(Game.self, from: data) {
+            game = g
+        }
+        if let data = UserDefaults.standard.data(forKey: lastPlayersKey),
+           let names = try? JSONDecoder().decode([String].self, from: data) {
+            lastPlayerNames = names
+        }
     }
 }
