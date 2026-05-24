@@ -33,7 +33,8 @@ struct ResultView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .top) {
+            VStack(spacing: 0) {
 
             // ── Winner banner ──────────────────────────────────────────────
             if let winner = ranked.first {
@@ -142,6 +143,11 @@ struct ResultView: View {
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 24)
-        }
+        } // VStack
+
+        // Confetti fires once when the screen appears, then stops
+        ConfettiView()
+
+        } // ZStack
     }
 }

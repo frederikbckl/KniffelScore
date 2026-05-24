@@ -163,19 +163,25 @@ struct GameView: View {
     }
 
     private func labelCell(cat: ScoreCategory) -> some View {
-        HStack(spacing: 0) {
+        let isTotal = cat.id == "calc_total"
+        return HStack(spacing: 0) {
             Text(cat.name)
-                .font(.caption)
-                .foregroundStyle(cat.kind == .calculated ? Color.secondary : Color.primary)
+                .font(isTotal ? .caption.weight(.bold) : .caption)
+                .foregroundStyle(
+                    isTotal        ? Color.appPrimary :
+                    cat.kind == .calculated ? Color.secondary : Color.primary
+                )
                 .lineLimit(1)
                 .minimumScaleFactor(0.65)
                 .padding(.horizontal, 8)
             Spacer(minLength: 0)
         }
         .frame(height: rowHeight)
-        .background(cat.kind == .calculated
-            ? Color(.tertiarySystemBackground)
-            : Color(.systemBackground))
+        .background(
+            isTotal             ? Color.appPrimary.opacity(0.07) :
+            cat.kind == .calculated ? Color(.tertiarySystemBackground) :
+                                  Color(.systemBackground)
+        )
         .overlay(alignment: .bottom) {
             rowSeparator(for: cat)
         }
@@ -265,15 +271,21 @@ struct GameView: View {
     }
 
     private func calculatedCell(categoryId: String, player: Player) -> some View {
-        let value = ScoreCalculator.calculatedValue(categoryId: categoryId, for: player)
+        let value       = ScoreCalculator.calculatedValue(categoryId: categoryId, for: player)
         let bonusEarned = categoryId == "calc_bonus" && value == 35
+        let isTotal     = categoryId == "calc_total"
         return Text(value.map { "\($0)" } ?? "—")
-            .font(.caption.weight(.medium))
-            .foregroundStyle(bonusEarned ? Color.appGreen : Color.secondary)
+            .font(isTotal ? .callout.weight(.bold) : .caption.weight(.medium))
+            .foregroundStyle(
+                isTotal     ? Color.appPrimary :
+                bonusEarned ? Color.appGreen   : Color.secondary
+            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(bonusEarned
-                ? Color.appGreen.opacity(0.08)
-                : Color(.tertiarySystemBackground))
+            .background(
+                isTotal     ? Color.appPrimary.opacity(0.07) :
+                bonusEarned ? Color.appGreen.opacity(0.08)   :
+                              Color(.tertiarySystemBackground)
+            )
     }
 
     private func scoredCellLabel(score: Int, dimmed: Bool) -> some View {
