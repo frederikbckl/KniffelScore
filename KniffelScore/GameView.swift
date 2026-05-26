@@ -8,7 +8,7 @@ struct GameView: View {
     @State private var selectedCategory: ScoreCategory?
     @State private var editingPlayerIndex: Int?
     @State private var isCorrection = false
-    @State private var playerHeaderOffset: CGFloat = 0
+    @State private var labelScrollOffset: CGFloat = 0
 
     private let rowHeight: CGFloat = 38
     private let headerHeight: CGFloat = 52
@@ -29,55 +29,68 @@ struct GameView: View {
             GeometryReader { geo in
                 let availWidth = geo.size.width - labelWidth - 0.5
                 let colWidth = max(minColumnWidth, availWidth / CGFloat(game.players.count))
+                let totalPlayerWidth = colWidth * CGFloat(game.players.count)
 
-                VStack(spacing: 0) {
-                    // Sticky player name header row
-                    HStack(alignment: .center, spacing: 0) {
+                HStack(alignment: .top, spacing: 0) {
+
+                    // ── Label column ──────────────────────────────────────────
+                    // Not in any scroll view. Its vertical position is driven by
+                    // labelScrollOffset, which mirrors the score area's scroll.
+                    // allowsHitTesting(false) lets touches fall through to the
+                    // score area so the user can scroll from anywhere.
+                    VStack(spacing: 0) {
                         Color(.systemBackground)
-                            .frame(width: labelWidth, height: headerHeight)
+                            .frame(height: headerHeight)
+                        Divider()
+                        ZStack(alignment: .top) {
+                            labelColumn
+                                .offset(y: -labelScrollOffset)
+                        }
+                        .frame(maxHeight: .infinity)
+                        .clipped()
+                    }
+                    .frame(width: labelWidth)
+                    .background(Color(.systemBackground))
+                    .allowsHitTesting(false)
 
-                        Rectangle()
-                            .fill(Color(.separator))
-                            .frame(width: 0.5, height: headerHeight)
+                    Rectangle()
+                        .fill(Color(.separator))
+                        .frame(width: 0.5)
 
-                        ZStack(alignment: .leading) {
+                    // ── Player headers + scores ───────────────────────────────
+                    // Both live in the SAME ScrollView(.horizontal) so their
+                    // columns are always perfectly aligned — no sync needed.
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        VStack(spacing: 0) {
+                            // Player name header — above the vertical scroll,
+                            // so it stays put when scores scroll down.
                             HStack(alignment: .top, spacing: 0) {
                                 ForEach(Array(game.players.enumerated()), id: \.1.id) { idx, _ in
                                     playerHeader(playerIndex: idx, width: colWidth)
                                 }
                             }
-                            .offset(x: playerHeaderOffset)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .clipped()
-                    }
-                    .frame(height: headerHeight)
+                            .frame(width: totalPlayerWidth, height: headerHeight)
 
-                    Divider()
+                            Divider()
 
-                    // Vertically scrollable score rows
-                    ScrollView(.vertical, showsIndicators: false) {
-                        HStack(alignment: .top, spacing: 0) {
-                            labelColumn
-                                .frame(width: labelWidth)
-                                .background(Color(.systemBackground))
-
-                            Rectangle()
-                                .fill(Color(.separator))
-                                .frame(width: 0.5)
-
-                            ScrollView(.horizontal, showsIndicators: false) {
+                            // Score cells with their own vertical scroll.
+                            ScrollView(.vertical, showsIndicators: false) {
                                 HStack(alignment: .top, spacing: 0) {
                                     ForEach(Array(game.players.enumerated()), id: \.1.id) { idx, _ in
                                         playerScoreColumn(playerIndex: idx, width: colWidth)
                                     }
                                 }
+                                .frame(width: totalPlayerWidth)
+                                .padding(.bottom, 16)
                             }
-                            .onScrollGeometryChange(for: CGFloat.self, of: { $0.contentOffset.x }) { _, newX in
-                                playerHeaderOffset = -newX
+                            .onScrollGeometryChange(
+                                for: CGFloat.self,
+                                of: { $0.visibleRect.minY }
+                            ) { _, newY in
+                                labelScrollOffset = newY
                             }
                         }
-                        .padding(.bottom, 16)
+                        .frame(width: totalPlayerWidth)
                     }
                 }
             }
